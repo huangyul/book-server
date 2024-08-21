@@ -20,10 +20,8 @@ func WriteResultErr(c *gin.Context, err *errno.Errno) {
 	})
 }
 
-func WriteResult[T any](c *gin.Context, code int, msg string, data T) {
+func WriteResult[T any](c *gin.Context, data T) {
 	c.JSON(http.StatusOK, Result[T]{
-		Code: code,
-		Msg:  msg,
 		Data: data,
 	})
 }

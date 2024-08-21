@@ -1,8 +1,11 @@
 package domain
 
+import "time"
+
 type User struct {
+	ID        int64
 	Username  string
 	Password  string
-	CreatedAt int64
-	UpdatedAt int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

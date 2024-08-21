@@ -12,10 +12,16 @@ import (
 //go:generate mockgen -source=user.go -destination=./mock/user_mock.go -package=mocksvc
 type UserService interface {
 	SignUp(ctx context.Context, username, password string) (int64, error)
+	Profile(ctx context.Context, userID int64) (domain.User, error)
 }
 
 type userService struct {
 	repo repository.UserRepository
+}
+
+// Profile
+func (svc *userService) Profile(ctx context.Context, userID int64) (domain.User, error) {
+	return svc.repo.FindById(ctx, userID)
 }
 
 func NewUserService(repo repository.UserRepository) UserService {

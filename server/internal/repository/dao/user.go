@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/huangyul/book-server/internal/pkg/errno"
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 
 type UserDao interface {
 	Create(ctx context.Context, user User) (int64, error)
+	FindById(ctx context.Context, id int64) (User, error)
 }
 
 type GORMUserDao struct {
@@ -18,6 +20,9 @@ type GORMUserDao struct {
 
 // Create
 func (g *GORMUserDao) Create(ctx context.Context, user User) (int64, error) {
+	now := time.Now().UnixMilli()
+	user.CreatedAt = now
+	user.UpdatedAt = now
 	err := g.db.WithContext(ctx).Create(&user).Error
 	if errors.Is(err, gorm.ErrDuplicatedKey) {
 		return 0, errno.UserAlreadyExist
@@ -27,6 +32,18 @@ func (g *GORMUserDao) Create(ctx context.Context, user User) (int64, error) {
 
 	}
 	return user.ID, nil
+}
+
+func (g *GORMUserDao) FindById(ctx context.Context, id int64) (User, error) {
+	var user User
+	err := g.db.WithContext(ctx).Where("id = ?", id).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, errno.UserNotFound
+	}
+	if err != nil {
+		return user, errno.InternalServerError
+	}
+	return user, nil
 }
 
 func NewGORMUserDao(db *gorm.DB) UserDao {
