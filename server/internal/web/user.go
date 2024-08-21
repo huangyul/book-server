@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/huangyul/book-server/internal/pkg/bind"
 	"github.com/huangyul/book-server/internal/pkg/errno"
 	"github.com/huangyul/book-server/internal/service"
 )
@@ -36,7 +37,7 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 		ConfirmPassword string `json:"confirm_password" binding:"required"`
 	}
 	var req Req
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bind.Bind(c, &req); err != nil {
 		WriteResultErr(c, errno.BadRequest.SetMessage(err.Error()))
 		return
 	}
