@@ -40,6 +40,20 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 	return m.recorder
 }
 
+// Login mocks base method.
+func (m *MockUserService) Login(ctx context.Context, username, password string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Login", ctx, username, password)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Login indicates an expected call of Login.
+func (mr *MockUserServiceMockRecorder) Login(ctx, username, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockUserService)(nil).Login), ctx, username, password)
+}
+
 // Profile mocks base method.
 func (m *MockUserService) Profile(ctx context.Context, userID int64) (domain.User, error) {
 	m.ctrl.T.Helper()

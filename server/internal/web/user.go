@@ -27,6 +27,8 @@ func (u *UserHandler) RegisterRoutes(g *gin.Engine) {
 		ug.POST("/signup", u.SignUp)
 		// 获取详情
 		ug.GET("/profile/:id", u.Profile)
+		// 登录接口
+		ug.POST("/login", u.Login)
 	}
 }
 
@@ -72,6 +74,24 @@ func (h *UserHandler) Profile(ctx *gin.Context) {
 		UpdatedAt: dUser.UpdatedAt.Format(time.DateOnly),
 	}
 	WriteResult(ctx, user)
+}
+
+func (h *UserHandler) Login(ctx *gin.Context) {
+	type Req struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+	var req Req
+	if err := bind.Bind(ctx, &req); err != nil {
+		WriteResultErr(ctx, errno.BadRequest.SetMessage(err.Error()))
+		return
+	}
+	if err := h.svc.Login(ctx, req.Username, req.Password); err != nil {
+		WriteResultErr(ctx, errno.InternalServerError.SetMessage(err.Error()))
+		return
+	}
+
+	WrtieSuccess(ctx)
 }
 
 type UserResp struct {

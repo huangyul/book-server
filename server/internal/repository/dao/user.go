@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/huangyul/book-server/internal/pkg/errno"
@@ -12,6 +13,7 @@ import (
 type UserDao interface {
 	Create(ctx context.Context, user User) (int64, error)
 	FindById(ctx context.Context, id int64) (User, error)
+	FindByName(ctx context.Context, username string) (User, error)
 }
 
 type GORMUserDao struct {
@@ -24,7 +26,8 @@ func (g *GORMUserDao) Create(ctx context.Context, user User) (int64, error) {
 	user.CreatedAt = now
 	user.UpdatedAt = now
 	err := g.db.WithContext(ctx).Create(&user).Error
-	if errors.Is(err, gorm.ErrDuplicatedKey) {
+
+	if strings.Contains(err.Error(), "1062") {
 		return 0, errno.UserAlreadyExist
 	}
 	if err != nil {
@@ -37,6 +40,18 @@ func (g *GORMUserDao) Create(ctx context.Context, user User) (int64, error) {
 func (g *GORMUserDao) FindById(ctx context.Context, id int64) (User, error) {
 	var user User
 	err := g.db.WithContext(ctx).Where("id = ?", id).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, errno.UserNotFound
+	}
+	if err != nil {
+		return user, errno.InternalServerError
+	}
+	return user, nil
+}
+
+func (g *GORMUserDao) FindByName(ctx context.Context, username string) (User, error) {
+	var user User
+	err := g.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return user, errno.UserNotFound
 	}
