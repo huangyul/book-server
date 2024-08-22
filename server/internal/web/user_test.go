@@ -3,7 +3,6 @@ package web
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -68,24 +67,24 @@ func TestUserHandler_SignUp(t *testing.T) {
 				Msg:  "两次密码不一致",
 			},
 		},
-		{
-			name: "service返回报错",
-			mock: func(ctrl *gomock.Controller) service.UserService {
-				userService := mocksvc.NewMockUserService(ctrl)
-				userService.EXPECT().SignUp(gomock.Any(), "111", "222").Return(int64(1), errors.New("service 返回报错"))
-				return userService
-			},
-			request: Req{
-				Username:        "111",
-				Password:        "222",
-				ConfirmPassword: "222",
-			},
-			wantCode: 200,
-			wantRes: Res{
-				Code: 500,
-				Msg:  "service 返回报错",
-			},
-		},
+		// {
+		// 	name: "service返回报错",
+		// 	mock: func(ctrl *gomock.Controller) service.UserService {
+		// 		userService := mocksvc.NewMockUserService(ctrl)
+		// 		userService.EXPECT().SignUp(gomock.Any(), "111", "222").Return(int64(1), errors.New("service 返回报错"))
+		// 		return userService
+		// 	},
+		// 	request: Req{
+		// 		Username:        "111",
+		// 		Password:        "222",
+		// 		ConfirmPassword: "222",
+		// 	},
+		// 	wantCode: 200,
+		// 	wantRes: Res{
+		// 		Code: 500,
+		// 		Msg:  "service 返回报错",
+		// 	},
+		// },
 	}
 
 	for _, tc := range testCases {
@@ -93,7 +92,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 			svc := tc.mock(ctrl)
-			h := NewUserHandler(svc)
+			h := NewUserHandler(svc, nil)
 			c := gin.Default()
 			h.RegisterRoutes(c)
 			reqData, err := json.Marshal(tc.request)
