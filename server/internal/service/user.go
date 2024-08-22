@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
 
@@ -17,7 +16,7 @@ import (
 type UserService interface {
 	SignUp(ctx context.Context, username, password string) (int64, error)
 	Profile(ctx context.Context, userID int64) (domain.User, error)
-	Login(ctx context.Context, username, password string) error
+	Login(ctx context.Context, username, password string) (int64, error)
 }
 
 type userService struct {
@@ -47,24 +46,18 @@ func (svc *userService) SignUp(ctx context.Context, username, password string) (
 	})
 }
 
-func (svc *userService) Login(ctx context.Context, username, password string) error {
+func (svc *userService) Login(ctx context.Context, username, password string) (int64, error) {
 	user, err := svc.repo.FindByName(ctx, username)
 	if errors.Is(err, errno.UserNotFound) {
-		return errno.BadRequest.SetMessage("账号或密码错误")
+		return 0, errno.BadRequest.SetMessage("账号或密码错误")
 	}
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return errno.BadRequest.SetMessage("账号或密码错误")
+		return 0, errno.BadRequest.SetMessage("账号或密码错误")
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, JwtClaims{})
-	tokenStr, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		return errno.InternalServerError
-	}
-	fmt.Print(tokenStr)
-	return nil
+	return user.ID, nil
 }
 
 type JwtClaims struct {

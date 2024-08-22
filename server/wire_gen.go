@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	"github.com/huangyul/book-server/internal/pkg/jwt"
 	"github.com/huangyul/book-server/internal/repository"
 	"github.com/huangyul/book-server/internal/repository/dao"
 	"github.com/huangyul/book-server/internal/service"
@@ -23,8 +24,10 @@ func InitWebServer() *gin.Engine {
 	userDao := dao.NewGORMUserDao(db)
 	userRepository := repository.NewUserRepository(userDao)
 	userService := service.NewUserService(userRepository)
-	userHandler := web.NewUserHandler(userService)
-	engine := ioc.InitWeb(userHandler)
+	jwtJWT := jwt.NewJwtService()
+	userHandler := web.NewUserHandler(userService, jwtJWT)
+	v := ioc.InitWebMiddlewares(jwtJWT)
+	engine := ioc.InitWeb(userHandler, v)
 	return engine
 }
 

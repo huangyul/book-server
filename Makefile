@@ -1,4 +1,4 @@
-.PHONY: all server web
+.PHONY: all server web wire
 
 all: server web
 
@@ -7,3 +7,6 @@ server:
 
 web:
 	cd web && pnpm dev
+
+wire:
+	cd server && wire

@@ -7,16 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/huangyul/book-server/internal/pkg/bind"
 	"github.com/huangyul/book-server/internal/pkg/errno"
+	"github.com/huangyul/book-server/internal/pkg/jwt"
 	"github.com/huangyul/book-server/internal/service"
 )
 
 type UserHandler struct {
 	svc service.UserService
+	j   jwt.JWT
 }
 
-func NewUserHandler(svc service.UserService) *UserHandler {
+func NewUserHandler(svc service.UserService, j jwt.JWT) *UserHandler {
 	return &UserHandler{
 		svc: svc,
+		j:   j,
 	}
 }
 
@@ -86,12 +89,27 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 		WriteResultErr(ctx, errno.BadRequest.SetMessage(err.Error()))
 		return
 	}
-	if err := h.svc.Login(ctx, req.Username, req.Password); err != nil {
+	userId, err := h.svc.Login(ctx, req.Username, req.Password)
+	if err != nil {
 		WriteResultErr(ctx, errno.InternalServerError.SetMessage(err.Error()))
 		return
 	}
 
-	WrtieSuccess(ctx)
+	type Res struct {
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	atoken, rToken, err := h.j.GenerateToken(userId)
+	if err != nil {
+		WriteResultErr(ctx, errno.InternalServerError.SetMessage(err.Error()))
+		return
+	}
+	WriteResult(ctx, Res{
+		AccessToken:  atoken,
+		RefreshToken: rToken,
+	})
+
 }
 
 type UserResp struct {

@@ -41,11 +41,12 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 }
 
 // Login mocks base method.
-func (m *MockUserService) Login(ctx context.Context, username, password string) error {
+func (m *MockUserService) Login(ctx context.Context, username, password string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, username, password)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Login indicates an expected call of Login.
