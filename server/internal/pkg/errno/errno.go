@@ -1,5 +1,6 @@
 package errno
 
+// 基础错误码
 var (
 	OK                  = &Errno{Code: 0, Msg: "OK"}
 	BadRequest          = &Errno{Code: 400, Msg: "Bad request"}
@@ -22,7 +23,8 @@ func (err *Errno) SetMessage(msg string) *Errno {
 	return err
 }
 
-func Decode(err error) *Errno {
+// EncodeErr decode error to Errno
+func EncodeErr(err error) *Errno {
 	if err == nil {
 		return OK
 	}

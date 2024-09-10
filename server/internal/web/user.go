@@ -91,7 +91,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 	}
 	userId, err := h.svc.Login(ctx, req.Username, req.Password)
 	if err != nil {
-		WriteResultErr(ctx, errno.Decode(err))
+		WriteResultErr(ctx, errno.EncodeErr(err))
 		return
 	}
 
@@ -102,7 +102,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 
 	atoken, rToken, err := h.j.GenerateToken(userId)
 	if err != nil {
-		WriteResultErr(ctx, errno.Decode(err))
+		WriteResultErr(ctx, errno.EncodeErr(err))
 		return
 	}
 	WriteResult(ctx, Res{
