@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+//go:generate mockgen -source=jwt.go -destination=./mock/jwt_mock.go -package=mockjwt
 type JWT interface {
 	// GenerateToken 通过 userid 生成 accessToken 和 refreshToken
 	GenerateToken(userID int64) (string, string, error)

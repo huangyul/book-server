@@ -26,11 +26,11 @@ func NewUserHandler(svc service.UserService, j jwt.JWT) *UserHandler {
 func (u *UserHandler) RegisterRoutes(g *gin.Engine) {
 	ug := g.Group("/user")
 	{
-		// 注册接口
+		// 注册
 		ug.POST("/signup", u.SignUp)
-		// 获取详情
+		// 获取
 		ug.GET("/profile/:id", u.Profile)
-		// 登录接口
+		// 登录
 		ug.POST("/login", u.Login)
 	}
 }
@@ -91,7 +91,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 	}
 	userId, err := h.svc.Login(ctx, req.Username, req.Password)
 	if err != nil {
-		WriteResultErr(ctx, errno.InternalServerError.SetMessage(err.Error()))
+		WriteResultErr(ctx, errno.Decode(err))
 		return
 	}
 
@@ -102,7 +102,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 
 	atoken, rToken, err := h.j.GenerateToken(userId)
 	if err != nil {
-		WriteResultErr(ctx, errno.InternalServerError.SetMessage(err.Error()))
+		WriteResultErr(ctx, errno.Decode(err))
 		return
 	}
 	WriteResult(ctx, Res{

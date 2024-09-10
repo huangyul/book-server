@@ -49,13 +49,13 @@ func (svc *userService) SignUp(ctx context.Context, username, password string) (
 func (svc *userService) Login(ctx context.Context, username, password string) (int64, error) {
 	user, err := svc.repo.FindByName(ctx, username)
 	if errors.Is(err, errno.UserNotFound) {
-		return 0, errno.BadRequest.SetMessage("账号或密码错误")
+		return 0, errno.UserPasswordIncorrect
 	}
 	if err != nil {
 		return 0, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return 0, errno.BadRequest.SetMessage("账号或密码错误")
+		return 0, errno.UserPasswordIncorrect
 	}
 	return user.ID, nil
 }

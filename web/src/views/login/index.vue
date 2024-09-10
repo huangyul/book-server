@@ -33,8 +33,8 @@ dataThemeChange(overallStyle.value)
 const { title } = useNav()
 
 const ruleForm = reactive({
-  email: '1111@qq.com',
-  password: '1111qq',
+  username: 'user1',
+  password: 'user1',
 })
 
 async function onLogin(formEl: FormInstance | undefined) {
@@ -44,7 +44,7 @@ async function onLogin(formEl: FormInstance | undefined) {
     if (valid) {
       loading.value = true
       useUserStoreHook()
-        .handleLogin({ email: ruleForm.email, password: ruleForm.password })
+        .handleLogin({ username: ruleForm.username, password: ruleForm.password })
         .then(() => {
           // 获取后端路由
           return initRouter().then(() => {
@@ -103,8 +103,8 @@ onBeforeUnmount(() => {
         message: '请输入账号',
         trigger: 'blur',
       },
-    ]" prop="email">
-                <el-input v-model="ruleForm.email" clearable placeholder="账号" :prefix-icon="useRenderIcon(User)" />
+    ]" prop="username">
+                <el-input v-model="ruleForm.username" clearable placeholder="账号" :prefix-icon="useRenderIcon(User)" />
               </el-form-item>
             </Motion>
 

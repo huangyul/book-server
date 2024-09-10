@@ -19,6 +19,10 @@ import (
 
 var trans ut.Translator
 
+func init() {
+	InitTrans("zh")
+}
+
 func InitTrans(locale string) {
 	if val, ok := binding.Validator.Engine().(*validator.Validate); ok {
 
@@ -60,7 +64,7 @@ func InitTrans(locale string) {
 
 // Bind 绑定和验证请求数据
 func Bind(ctx *gin.Context, obj any) error {
-	err := ctx.ShouldBind(obj)
+	err := ctx.Bind(obj)
 	if err != nil {
 		var v validator.ValidationErrors
 		if errors.As(err, &v) {

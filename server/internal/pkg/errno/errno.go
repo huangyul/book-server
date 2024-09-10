@@ -21,3 +21,14 @@ func (err *Errno) SetMessage(msg string) *Errno {
 	err.Msg = msg
 	return err
 }
+
+func Decode(err error) *Errno {
+	if err == nil {
+		return OK
+	}
+	val, ok := err.(*Errno)
+	if !ok {
+		return InternalServerError
+	}
+	return val
+}
