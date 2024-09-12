@@ -32,6 +32,8 @@ func (u *UserHandler) RegisterRoutes(g *gin.Engine) {
 		ug.GET("/profile/:id", u.Profile)
 		// 登录
 		ug.POST("/login", u.Login)
+		// 修改个人信息
+		ug.POST("/edit", u.Edit)
 	}
 }
 
@@ -110,6 +112,24 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 		RefreshToken: rToken,
 	})
 
+}
+
+func (h *UserHandler) Edit(ctx *gin.Context) {
+	type Req struct {
+		Username string `json:"username"`
+	}
+	var req Req
+	if err := bind.Bind(ctx, &req); err != nil {
+		WriteResultErr(ctx, errno.BadRequest.SetMessage(err.Error()))
+		return
+	}
+	userID := ctx.GetInt64("userId")
+	err := h.svc.Edit(ctx, userID, req.Username)
+	if err != nil {
+		WriteResultErr(ctx, errno.EncodeErr(err))
+		return
+	}
+	WrtieSuccess(ctx)
 }
 
 type UserResp struct {

@@ -12,6 +12,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user domain.User) (int64, error)
 	FindById(ctx context.Context, id int64) (domain.User, error)
 	FindByName(ctx context.Context, username string) (domain.User, error)
+	UpdateById(ctx context.Context, id int64, u domain.User) error
 }
 
 type userRepository struct {
@@ -43,6 +44,10 @@ func (u *userRepository) FindByName(ctx context.Context, username string) (domai
 		return domain.User{}, err
 	}
 	return u.toDoman(dUser), nil
+}
+
+func (u *userRepository) UpdateById(ctx context.Context, id int64, user domain.User) error {
+	return u.dao.UpdateById(ctx, id, u.toEntity(user))
 }
 
 func (u *userRepository) toEntity(user domain.User) dao.User {

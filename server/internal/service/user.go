@@ -17,6 +17,7 @@ type UserService interface {
 	SignUp(ctx context.Context, username, password string) (int64, error)
 	Profile(ctx context.Context, userID int64) (domain.User, error)
 	Login(ctx context.Context, username, password string) (int64, error)
+	Edit(ctx context.Context, userID int64, username string) error
 }
 
 type userService struct {
@@ -58,6 +59,19 @@ func (svc *userService) Login(ctx context.Context, username, password string) (i
 		return 0, errno.UserPasswordIncorrect
 	}
 	return user.ID, nil
+}
+
+func (svc *userService) Edit(ctx context.Context, userID int64, username string) error {
+	_, err := svc.repo.FindById(ctx, userID)
+	if errors.Is(err, errno.UserNotFound) {
+		return errno.UserNotFound
+	}
+	if err != nil {
+		return err
+	}
+	return svc.repo.UpdateById(ctx, userID, domain.User{
+		Username: username,
+	})
 }
 
 type JwtClaims struct {

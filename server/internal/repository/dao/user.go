@@ -14,6 +14,7 @@ type UserDao interface {
 	Create(ctx context.Context, user User) (int64, error)
 	FindById(ctx context.Context, id int64) (User, error)
 	FindByName(ctx context.Context, username string) (User, error)
+	UpdateById(ctx context.Context, id int64, user User) error
 }
 
 type GORMUserDao struct {
@@ -59,6 +60,16 @@ func (g *GORMUserDao) FindByName(ctx context.Context, username string) (User, er
 		return user, errno.InternalServerError
 	}
 	return user, nil
+}
+
+func (g *GORMUserDao) UpdateById(ctx context.Context, id int64, user User) error {
+	now := time.Now().UnixMilli()
+	err := g.db.WithContext(ctx).Model(&User{}).Where("id = ?", id).Updates(map[string]any{
+		"username":   user.Username,
+		"updated_at": now,
+	}).Error
+
+	return err
 }
 
 func NewGORMUserDao(db *gorm.DB) UserDao {
