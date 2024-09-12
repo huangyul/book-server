@@ -23,7 +23,7 @@ func (err *Errno) SetMessage(msg string) *Errno {
 	return err
 }
 
-// EncodeErr decode error to Errno
+// EncodeErr 将 error 编码为 Errno
 func EncodeErr(err error) *Errno {
 	if err == nil {
 		return OK

@@ -28,7 +28,7 @@ func (u *UserHandler) RegisterRoutes(g *gin.Engine) {
 	{
 		// 注册
 		ug.POST("/signup", u.SignUp)
-		// 获取
+		// 获取个人信息
 		ug.GET("/profile/:id", u.Profile)
 		// 登录
 		ug.POST("/login", u.Login)
